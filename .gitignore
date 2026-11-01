@@ -26,3 +26,17 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Mac voice-clone setup — downloaded or personal, never commit
+IndicF5/
+models/
+outputs/
+voices/*/
+data/my_voice/
+
+# Bake-off engines/outputs
+engines/*/.venv/
+
+# Personal / client scripts stay local; mixed_test.txt is the shared example
+data/script/*
+!data/script/mixed_test.txt

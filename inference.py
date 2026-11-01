@@ -174,6 +174,7 @@ def _check_patch_active() -> None:
 def load_model(
     hf_token: Optional[str] = None,
     device: Optional[str] = None,
+    model_path: Optional[str] = None,
 ) -> object:
     """Load IndicF5 from HuggingFace.
 
@@ -210,8 +211,12 @@ def load_model(
     if device is None:
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    if model_path is None:
+        local = Path(__file__).resolve().parent / "models" / "IndicF5"
+        model_path = str(local) if (local / "model.safetensors").exists() else "ai4bharat/IndicF5"
+
     model = AutoModel.from_pretrained(
-        "ai4bharat/IndicF5",
+        model_path,
         trust_remote_code=True,
     ).to(device)
 
@@ -230,6 +235,8 @@ def synthesize(
     *,
     preprocess: bool = True,
     speed: float = 1.0,
+    nfe_step: int = 32,
+    cfg_strength: float = 2.0,
 ) -> np.ndarray:
     """Generate speech from `text` using IndicF5.
 
@@ -276,22 +283,27 @@ def synthesize(
                 f"Text became empty after preprocessing: {text!r}"
             )
 
+    # This IndicF5 revision's forward() has no speed kwarg; it reads config.speed.
+    model.config.speed = speed
+    model.config.nfe_step = nfe_step
+    model.config.cfg_strength = cfg_strength
     with torch.inference_mode():
         audio = model(
             text=input_text,
             ref_audio_path=str(ref_audio_path),
             ref_text=ref_text,
-            speed=speed,
         )
 
     # Normalise output type — model may return Tensor, ndarray, or list
     if hasattr(audio, "cpu"):
         audio = audio.cpu().numpy()
-    audio = np.asarray(audio, dtype=np.float32).squeeze()
+    audio = np.asarray(audio).squeeze()
 
-    # int16 PCM → float32 [-1, 1]
-    if audio.dtype == np.int16:
-        audio = audio.astype(np.float32) / 32768.0
+    # int PCM → float32 [-1, 1]. Must check dtype BEFORE casting, or the scale is skipped
+    # and every sample clips (pydub returns int16 samples here).
+    if np.issubdtype(audio.dtype, np.integer):
+        audio = audio.astype(np.float32) / float(np.iinfo(audio.dtype).max + 1)
+    audio = audio.astype(np.float32)
 
     if audio.ndim != 1:
         raise RuntimeError(

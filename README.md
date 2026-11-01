@@ -1,5 +1,59 @@
 # Hinglish TTS
 
+## Voice cloning studio for Mac (start here)
+
+Clone anyone's voice from a short recording and generate Hindi, Hinglish and English voiceovers. It runs fully
+on your own Mac, with no cloud and no per-minute fees.
+
+Forked from [harrrshall/hinglish-tts](https://github.com/harrrshall/hinglish-tts) (Hinglish TTS on IndicF5); this fork adds Mac setup, voice profiles, pace matching, Chatterbox for English and AI-assistant instructions.
+
+### Easiest: let your AI assistant drive it
+
+Open this folder in **Claude Code, Codex, Cursor or Gemini CLI** and say:
+
+> *"Set this repo up, add my voice from `~/Downloads/me.mp3`, and make a voiceover of this script: …"*
+
+The assistant reads [AGENTS.md](AGENTS.md) and handles setup, the voice profile, writing the script so it's
+pronounced correctly, rendering, and fixes. You only accept the model terms on Hugging Face and type your token into the terminal.
+
+### Or do it yourself in 3 commands
+
+```bash
+./setup_mac.sh --with-chatterbox                                   # once, ~30 min
+.venv/bin/python add_voice.py ~/Downloads/me.mp3 --name me          # once per voice
+HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python synth_script.py my_script.txt outputs/my_script --voice me --engine best
+```
+
+Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
+
+### What it can do
+
+- **Clone a voice zero-shot** from any recording (mp3/wav/m4a/video audio). Background music is removed and the best clip and its transcript are picked automatically.
+- **Hindi, Hinglish and English** in one script, line by line: IndicF5 for Hindi/Hinglish, Chatterbox for English, or `--engine best` to render both and keep the better take.
+- **Match the speaker's own pace**, measured from their recording, syllable by syllable.
+- **ElevenLabs-style controls:** speed, similarity, seed, per-line `[speed=]` `[seed=]` `[engine=]` tags, and `<break time="0.6s" />` pauses.
+- **Fast re-runs:** edit one line and only that line re-renders.
+- **Private and offline:** after setup, nothing leaves your Mac.
+
+### What it can't do (yet)
+
+- **Macs only** (Apple Silicon M1–M4) with `setup_mac.sh`. Linux/CUDA users can use the original `setup.sh` for IndicF5 only.
+- **Not real-time:** about 1–3× real time, so a 10-minute voiceover takes roughly 10–30 minutes.
+- **Longer recordings don't train it.** This is zero-shot cloning: beyond ~3 minutes, more audio doesn't make the clone closer. Fine-tuning on an hour of audio isn't built yet.
+- **Pronunciation follows the text you write.** Numbers, acronyms and English words inside Hindi lines must be written the way they're spoken (AGENTS.md has the rules; an AI assistant does this for you).
+- **Emotion/style control is limited** to what's in the reference clip. Pick a clip in the tone you want.
+- **Other Indian languages** (Tamil, Bengali, …) are supported by IndicF5 but untested here.
+- **Chatterbox outputs carry an inaudible watermark** (Resemble AI's Perth) that identifies them as AI-generated.
+
+### Rules
+
+Only clone voices you own or have **explicit permission** to use. Never share your Hugging Face token in a chat
+or commit it. Licenses: this repo Apache-2.0, IndicF5 MIT (gated: accept its terms), Chatterbox MIT.
+
+---
+
+## About the underlying Hinglish TTS
+
 Open-source text-to-speech for Hindi-English code-mixed ("Hinglish") speech.
 Built on [IndicF5](https://huggingface.co/ai4bharat/IndicF5) (AI4Bharat, 330M params) with a two-line duration patch and automatic script normalisation via [IndicXlit](https://github.com/AI4Bharat/IndicXlit).
 Accepts Devanagari, Roman-script Hindi, mixed-script sentences, and English with Indian named entities — all in the same API call.
