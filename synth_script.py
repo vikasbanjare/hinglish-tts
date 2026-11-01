@@ -23,7 +23,8 @@ Inline, inside the script:
   [engine=chatterbox]    force an engine for just this line
   <break time="0.8s" />  exact pause inside a line (same syntax as ElevenLabs)
 
-English lines can be plain English ("Let us know in the comments"); Hindi/Hinglish lines in Devanagari.
+Write every line in Devanagari, English words too, as spoken: IndicF5 keeps the speaker's Indian accent that way.
+Plain English lines also work: Chatterbox reads them natively, but it can flatten the accent.
 Pieces are cached by text + settings, so editing a line or tag re-renders only what changed.
 """
 import argparse
@@ -76,11 +77,14 @@ REFS = (sorted((REF.parent / "refs").glob("[0-9][0-9].wav")) or [REF])[:args.ref
 lines = [l.strip() for l in Path(args.script).read_text(encoding="utf-8").splitlines() if l.strip()]
 out = Path(args.out_dir).resolve(); cache = out / "cache"; cache.mkdir(parents=True, exist_ok=True)
 pace = Path(args.pace_from) if args.pace_from else None
-her_rate = rate(pace, pace.with_suffix(".txt").read_text(encoding="utf-8")) if pace and pace.exists() else None
+pace_text = pace.with_suffix(".txt").read_text(encoding="utf-8") if pace and pace.exists() else None
+her_rate = rate(pace, pace_text) if pace_text else None
 REF_INFO = {}  # ref -> (transcript, tempo): each clip may be read faster/slower than the speaker's average
 for r in REFS:
     t = r.with_suffix(".txt").read_text(encoding="utf-8").strip()
-    REF_INFO[r] = (t, her_rate / rate(r, t) if her_rate else 1.0)
+    # Syllable counts only compare within one script: a Devanagari ref vs a Roman full.txt once gave x0.69.
+    same_script = her_rate and bool(re.search("[\u0900-\u097f]", t)) == bool(re.search("[\u0900-\u097f]", pace_text))
+    REF_INFO[r] = (t, her_rate / rate(r, t) if same_script else 1.0)
 print(f"base tempo x{REF_INFO[REFS[0]][1]:.3f} (from {pace}), engine: {args.engine}, refs: {len(REFS)}")
 model = worker = judge = None
 
@@ -100,6 +104,10 @@ def render_indicf5(text: str, speed: float, seed: int, ref: Path) -> np.ndarray:
     if lang_of(text) == "en":  # IndicF5 reads Devanagari only
         from scoring.scripts.lib_normalize import to_unified_devanagari
         text = to_unified_devanagari(text)
+    if lang_of(ref_text) == "en":  # ponytail: word-by-word xlit is rough; AGENTS.md has the assistant rewrite ref text by hand
+        from scoring.scripts.lib_normalize import to_unified_devanagari
+        print(f"  warning: {ref.with_suffix('.txt')} is in English letters; write it in Devanagari for a clean IndicF5 read")
+        ref_text = to_unified_devanagari(ref_text)
     speed *= speed_for(text, ref_text) * tempo
     wav = cached("indicf5", text, f"{speed:.4f}", seed, args.cfg, args.nfe, ref=ref)
     if not wav.exists():

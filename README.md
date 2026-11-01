@@ -22,7 +22,7 @@ pronounced correctly, rendering, and fixes. You only accept the model terms on H
 git clone https://github.com/vikasbanjare/hinglish-tts && cd hinglish-tts
 ./setup_mac.sh --with-chatterbox                                   # once, ~30 min
 .venv/bin/python add_voice.py ~/Downloads/me.mp3 --name me          # once per voice
-HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python synth_script.py my_script.txt outputs/my_script --voice me --engine best
+HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python synth_script.py my_script.txt outputs/my_script --voice me
 ```
 
 Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
@@ -32,7 +32,7 @@ Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
 - **Clone a voice zero-shot** from any recording (mp3/wav/m4a/video audio). Background music is removed and the best clip and its transcript are picked automatically.
 - **Podcasts and interviews:** `--speakers 2` splits the recording into one voice profile per person.
 - **Use long recordings:** `--refs 5` tries the speaker's 5 best clips on every line and keeps the closest-sounding take. Long recordings also export as fine-tuning datasets (`finetune_prep.py`).
-- **Hindi, Hinglish and English** in one script, line by line: IndicF5 for Hindi/Hinglish, Chatterbox for English, or `--engine best` to render both and keep the better take.
+- **Hindi, Hinglish and English** in one script, line by line. IndicF5 is the default and keeps the speaker's accent; write English in Devanagari as spoken. Chatterbox reads plain English but can flatten an Indian accent.
 - **Match the speaker's own pace**, measured from their recording, syllable by syllable.
 - **ElevenLabs-style controls:** speed, similarity, seed, per-line `[speed=]` `[seed=]` `[engine=]` tags, and `<break time="0.6s" />` pauses.
 - **Fast re-runs:** edit one line and only that line re-renders.

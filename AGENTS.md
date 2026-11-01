@@ -34,7 +34,8 @@ Read this file fully before acting. The user may not be technical: do the work, 
 - Output `voices/NAME/`: `ref.wav` + `ref.txt` (the clip the model copies), `refs/` (top 5 clips), `full.wav` + `full.txt`
   (only this speaker; sets the pace), `segments.tsv` (every utterance; fine-tuning data), `lang.txt`.
 - Podcast/interview: add `--speakers 2` → `voices/NAME_1` (talks most), `NAME_2`. Ask the user which person is which.
-- Language is auto-detected; for English voices use `--engine chatterbox` (or `best`).
+- Language is auto-detected. **English voices: rewrite `refs/*.txt` and `ref.txt` in Devanagari, as spoken, word for word
+  with numbers as words** (`75-year` → `सेवेंटी फ़ाइव ईयर`). IndicF5 can't read English letters.
 - **Then show the user `voices/NAME/ref.txt` and ask them to listen to `ref.wav`.** Every word in `ref.txt` must
   match the audio exactly (Devanagari for Hindi/Hinglish). Fix wrong words in `ref.txt`; this matters more than anything else.
 - Only clone a voice the user owns or has the speaker's permission for. If that's unclear, ask.
@@ -47,7 +48,8 @@ must write it **the way it is spoken**:
 - **Hindi / Hinglish lines → Devanagari only**, English words included, as pronounced:
   `Apple का upcoming iPhone` → `ऐपल का अपकमिंग आईफ़ोन`. Don't use the automatic transliterator for whole
   English sentences: it maps word by word ("the" → थे, "could" → कोल्ड).
-- **Pure English lines → normal English** (they go to the Chatterbox engine).
+- **Pure English lines → also Devanagari, as spoken** (`Your habits matter` → `योर हैबिट्स मैटर`). IndicF5, the default
+  engine, then keeps the speaker's accent. Normal English letters only with `--engine chatterbox`, which flattens Indian accents.
 - **Numbers → words**, in the language the speaker would say them: `₹95,345 crore` → `नाइंटी फाइव थाउज़ंड थ्री हंड्रेड फोर्टी फाइव करोड़`,
   `FY25` → `एफ़वाई ट्वेंटी फाइव`, `2026` → `ट्वेंटी ट्वेंटी सिक्स`.
 - **Acronyms → one joined word**: `एयूएम`, `आईपीओ` (spaced letters get merged wrongly).
@@ -63,8 +65,9 @@ HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python syn
 ```
 
 - Output: `outputs/NAME/full.wav` (+ `01.wav`… per line). Give the user the path to `full.wav`.
-- `--engine indicf5` (Hindi/Hinglish, fastest), `chatterbox` (English), `best` (renders both per line, keeps
-  the take that sounds more like the speaker with fewer word errors; ~2–3× slower).
+- `--engine indicf5` (default; keeps the speaker's accent and pace), `chatterbox` (native English read, can flatten
+  the accent), `best` (renders both per line, keeps the closer-sounding take with fewer word errors; ~2–3× slower).
+  **`best` can't hear accent and often picks Chatterbox**, so don't use it when accent matters.
 - Speed: roughly 1–3× real time on M-series. For scripts over ~2 minutes run it in the background
   (`nohup … > outputs/NAME.log 2>&1 &`) and check the log; don't let a tool timeout kill it.
 

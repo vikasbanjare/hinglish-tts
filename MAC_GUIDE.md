@@ -50,7 +50,7 @@ HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python syn
 | `--engine` | Use for | Notes |
 |---|---|---|
 | `indicf5` (default) | Hindi / Hinglish | Follows the speaker's own pace most closely |
-| `chatterbox` | English | Reads plain English directly; Hindi paced to match the speaker |
+| `chatterbox` | English | Reads plain English directly; can flatten an Indian accent; Hindi paced to match the speaker |
 | `best` | Mixed scripts, or when quality matters most | Renders every line with both, keeps the one that sounds more like the speaker with every word right. ~2× slower. |
 
 Force one line with `[engine=chatterbox]` at its start.
@@ -60,7 +60,8 @@ Output: `outputs/my_script/full.wav` (plus `01.wav`, `02.wav`… per line). Re-r
 ### Writing the script (this decides pronunciation)
 
 - **Hindi/Hinglish lines:** write in **Devanagari**, English words too, the way they're spoken: `आईफ़ोन`, `कैश फ्लो`.
-- **Pure English lines:** write normal English (with `--engine chatterbox` or `best`).
+- **Pure English lines:** write them in Devanagari as spoken (`योर हैबिट्स मैटर`), which keeps the speaker's accent. Normal English needs `--engine chatterbox`, which can flatten it.
+- **English-speaking voices:** rewrite `ref.txt` and `refs/*.txt` in Devanagari too, word for word.
 - **Numbers as words** in the language you'd say them: `नाइंटी फाइव थाउज़ंड`, not `95,000`.
 - **Acronyms joined**: `एयूएम`, not `ए यू एम`.
 - One sentence or short clause per line; very long lines rush.
