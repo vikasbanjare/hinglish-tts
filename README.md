@@ -49,7 +49,7 @@ Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
 ### Rules
 
 Only clone voices you own or have **explicit permission** to use. Never share your Hugging Face token in a chat
-or commit it. Licenses: this repo Apache-2.0, IndicF5 MIT (gated: accept its terms), Chatterbox MIT.
+or commit it. Licenses: this fork's additions are **MIT** ([LICENSE](LICENSE)); files from the upstream repo stay Apache-2.0 ([LICENSE-APACHE](LICENSE-APACHE)). Models: IndicF5 MIT (gated: accept its terms), Chatterbox MIT.
 
 ---
 
