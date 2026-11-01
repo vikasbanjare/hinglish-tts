@@ -31,7 +31,10 @@ Read this file fully before acting. The user may not be technical: do the work, 
 ```
 
 - Input: any audio/video file of **one person**, ideally 30 s – 3 min of normal speech. Music is removed automatically.
-- Output `voices/NAME/`: `ref.wav` + `ref.txt` (the clip the model copies), `full.wav` + `full.txt` (sets the pace).
+- Output `voices/NAME/`: `ref.wav` + `ref.txt` (the clip the model copies), `refs/` (top 5 clips), `full.wav` + `full.txt`
+  (only this speaker; sets the pace), `segments.tsv` (every utterance; fine-tuning data), `lang.txt`.
+- Podcast/interview: add `--speakers 2` → `voices/NAME_1` (talks most), `NAME_2`. Ask the user which person is which.
+- Language is auto-detected; for English voices use `--engine chatterbox` (or `best`).
 - **Then show the user `voices/NAME/ref.txt` and ask them to listen to `ref.wav`.** Every word in `ref.txt` must
   match the audio exactly (Devanagari for Hindi/Hinglish). Fix wrong words in `ref.txt`; this matters more than anything else.
 - Only clone a voice the user owns or has the speaker's permission for. If that's unclear, ask.
@@ -77,6 +80,13 @@ HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python syn
 | Force an engine on one line | `[engine=chatterbox]` or `[engine=indicf5]` |
 | Pause inside a line | `<break time="0.6s" />` |
 | Gap between lines | `--gap 0.3` |
+| Closer voice (long recordings) | `--refs 5` |
+
+## Fine-tuning (English, optional)
+
+`engines/finetune_chatterbox.sh NAME` trains a LoRA adapter on the speaker's audio (third-party kit; tell the
+user it downloads and runs external code and takes 1–3 h; they may prefer to run it themselves).
+Dataset only: `.venv/bin/python finetune_prep.py NAME datasets/NAME`.
 
 ## When something's wrong
 
@@ -96,5 +106,5 @@ installed) and compare against the script.
 ## Files
 
 `setup_mac.sh` install · `add_voice.py` voice profiles · `synth_script.py` generate · `pacing.py` speed per line ·
-`quality.py` judge takes · `engines/` Chatterbox (own venv) · `bench/` engine bake-off · `inference.py` IndicF5 wrapper.
+`quality.py` judge takes · `finetune_prep.py` dataset export · `engines/` Chatterbox (own venv) · `bench/` engine bake-off · `inference.py` IndicF5 wrapper.
 Don't commit `voices/`, `models/`, `outputs/` (personal or large; already in `.gitignore`).

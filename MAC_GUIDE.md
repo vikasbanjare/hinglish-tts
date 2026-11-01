@@ -33,6 +33,9 @@ Any recording of **one person** speaking: mp3, wav, m4a, a video's audio track. 
   what you said in `voices/me/ref.txt`. Listen to the clip and fix any wrong word in the text.
   A mismatch between the clip and its text is the #1 cause of mumbled or skipped words.
 - Already-clean studio recording? Add `--no-clean` (faster).
+- **Podcast / interview with 2 people?** Add `--speakers 2`. You get `voices/me_1` (whoever talks most) and `voices/me_2`.
+  Check which is which by listening to each `ref.wav`.
+- **Long recording (10 min – 2 h)?** Fine. It saves the 5 best clips in `refs/`, and an hour takes ~20 min to transcribe.
 
 ## 3. Generate
 
@@ -73,8 +76,22 @@ Output: `outputs/my_script/full.wav` (plus `01.wav`, `02.wav`… per line). Re-r
 | Slow one line | `[speed=0.85]` at the start of that line |
 | A pause inside a line | `<break time="0.6s" />` |
 | More/less gap between lines | `--gap 0.3` |
+| Closer voice from a long recording | `--refs 5` (tries the 5 best clips per line, keeps the closest; 5× slower) |
 
 Pace already follows the speaker: it's measured from the whole recording you gave `add_voice.py`.
+
+## Fine-tuning (optional, experimental)
+
+Zero-shot cloning copies a voice from one clip. Fine-tuning trains the model on all of a speaker's audio
+(30+ min works best), which captures their accent, rhythm and pronunciation more deeply. English only for now.
+
+```bash
+engines/finetune_chatterbox.sh me      # me = a voice from add_voice.py
+```
+
+It exports the speaker's utterances as a dataset, installs the open-source
+[chatterbox-finetuning](https://github.com/gokhaneraslan/chatterbox-finetuning) kit (third-party: review it first),
+downloads the English base model (~3 GB) and trains a LoRA adapter. Expect 1–3 hours on an M-series Mac.
 
 ## Troubleshooting
 

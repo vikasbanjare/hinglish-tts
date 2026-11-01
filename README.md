@@ -30,6 +30,8 @@ Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
 ### What it can do
 
 - **Clone a voice zero-shot** from any recording (mp3/wav/m4a/video audio). Background music is removed and the best clip and its transcript are picked automatically.
+- **Podcasts and interviews:** `--speakers 2` splits the recording into one voice profile per person.
+- **Use long recordings:** `--refs 5` tries the speaker's 5 best clips on every line and keeps the closest-sounding take. Long recordings also export as fine-tuning datasets (`finetune_prep.py`).
 - **Hindi, Hinglish and English** in one script, line by line: IndicF5 for Hindi/Hinglish, Chatterbox for English, or `--engine best` to render both and keep the better take.
 - **Match the speaker's own pace**, measured from their recording, syllable by syllable.
 - **ElevenLabs-style controls:** speed, similarity, seed, per-line `[speed=]` `[seed=]` `[engine=]` tags, and `<break time="0.6s" />` pauses.
@@ -40,7 +42,7 @@ Step-by-step guide with all controls: [MAC_GUIDE.md](MAC_GUIDE.md).
 
 - **Macs only** (Apple Silicon M1–M4) with `setup_mac.sh`. Linux/CUDA users can use the original `setup.sh` for IndicF5 only.
 - **Not real-time:** about 1–3× real time, so a 10-minute voiceover takes roughly 10–30 minutes.
-- **Longer recordings don't train it.** This is zero-shot cloning: beyond ~3 minutes, more audio doesn't make the clone closer. Fine-tuning on an hour of audio isn't built yet.
+- **Fine-tuning is a separate, slower step.** Cloning is zero-shot. A long recording already helps (more reference clips to pick from with `--refs 5`, a podcast split per speaker with `--speakers 2`), but actually training on it (`engines/finetune_chatterbox.sh`, English, LoRA, 1–3 h) uses third-party code you run yourself and is still experimental on Macs.
 - **Pronunciation follows the text you write.** Numbers, acronyms and English words inside Hindi lines must be written the way they're spoken (AGENTS.md has the rules; an AI assistant does this for you).
 - **Emotion/style control is limited** to what's in the reference clip. Pick a clip in the tone you want.
 - **Other Indian languages** (Tamil, Bengali, …) are supported by IndicF5 but untested here.

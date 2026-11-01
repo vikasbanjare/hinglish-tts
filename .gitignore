@@ -40,3 +40,6 @@ engines/*/.venv/
 # Personal / client scripts stay local; mixed_test.txt is the shared example
 data/script/*
 !data/script/mixed_test.txt
+!data/script/podcast_test.txt
+datasets/
+engines/chatterbox-ft/
