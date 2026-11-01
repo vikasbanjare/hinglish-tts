@@ -19,6 +19,7 @@ pronounced correctly, rendering, and fixes. You only accept the model terms on H
 ### Or do it yourself in 3 commands
 
 ```bash
+git clone https://github.com/vikasbanjare/hinglish-tts && cd hinglish-tts
 ./setup_mac.sh --with-chatterbox                                   # once, ~30 min
 .venv/bin/python add_voice.py ~/Downloads/me.mp3 --name me          # once per voice
 HF_HUB_OFFLINE=1 PYTORCH_ENABLE_MPS_FALLBACK=1 PYTHONPATH=. .venv/bin/python synth_script.py my_script.txt outputs/my_script --voice me --engine best

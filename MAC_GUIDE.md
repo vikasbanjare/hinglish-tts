@@ -11,7 +11,7 @@ Runs fully offline after setup. Needs an M1/M2/M3/M4 Mac, ~10 GB free disk, Home
 3. Run:
 
 ```bash
-git clone <this repo> && cd hinglish-tts && ./setup_mac.sh --with-chatterbox
+git clone https://github.com/vikasbanjare/hinglish-tts && cd hinglish-tts && ./setup_mac.sh --with-chatterbox
 ```
 
 `--with-chatterbox` adds a second engine that's stronger on plain English (~4 GB more). Leave it off for Hindi-only use.
